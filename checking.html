@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyzing Email - Phish Shield</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+        .dark-mode {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+        .dark-mode .text-gray-600 {
+            color: #a0a0a0;
+        }
+        .dark-mode .text-gray-800 {
+            color: #ffffff;
+        }
+        .dark-mode .card {
+            background: rgba(40, 40, 40, 0.95);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .dark-mode .analysis-point {
+            background: rgba(60, 60, 60, 0.5);
+        }
+        .analyzing-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3498db, transparent);
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        @keyframes scan {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .bounce-dot {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        .progress-text {
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-text::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: shine 2s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .home-button:hover {
+            transform: scale(1.1);
+        }
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .spam-indicator {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #2ecc71 100%);
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+        .spam-score {
+            width: 0%;
+            height: 100%;
+            background: #3498db;
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+        .result-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .status-spam {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        .status-legitimate {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        .confidence-level {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #3498db;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .security-measures {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .security-measures h3 {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .analysis-point {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .analysis-point:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .analysis-point svg {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .highlight {
+            animation: highlight 1s ease;
+        }
+        @keyframes highlight {
+            0% { background-color: rgba(52, 152, 219, 0.2); }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-button">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+    </a>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-8 fade-in">
+                <div class="flex items-center justify-center mb-4">
+                    <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h1 class="app-title">Phish Shield</h1>
+                </div>
+                <p class="text-gray-600 text-lg">We're analyzing your email content</p>
+            </div>
+
+            <div id="analyzing" class="relative analysis-card rounded-lg p-8 mb-6 overflow-hidden">
+                <div class="scan-line"></div>
+                
+                <div class="text-center">
+                    <div class="inline-block mb-4">
+                        <svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2 progress-text">Analyzing Content<span class="analyzing-dots"></span></h2>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-center space-x-2">
+                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.3s"></div>
+                        </div>
+                        
+                        <p class="text-gray-600 progress-text text-lg">Scanning for phishing indicators</p>
+                        <p class="text-gray-600 progress-text text-lg">Analyzing email structure and patterns</p>
+                        <p class="text-gray-600 progress-text text-lg">Evaluating security threats</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="result" class="hidden result-card fade-in">
+                <h2 class="text-2xl font-bold mb-4">Security Analysis Result</h2>
+                <div class="spam-indicator">
+                    <div id="spamScore" class="spam-score"></div>
+                </div>
+                <div id="resultContent" class="mt-4">
+                    <div id="status" class="result-status"></div>
+                    <div id="confidence" class="confidence-level"></div>
+                    <div class="security-measures">
+                        <h3>Security Measures</h3>
+                        <p id="recommendations" class="text-gray-600"></p>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <button id="analyzeAnother" class="btn-primary text-white font-bold py-3 px-6 rounded-lg">
+                        Analyze Another Email
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-gray-500 text-lg">This process usually takes a few seconds</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Get the email text from localStorage
+        const emailText = localStorage.getItem('emailToCheck');
+        
+        // Function to perform the analysis
+        async function performAnalysis() {
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: new URLSearchParams({ email: emailText }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Analysis failed');
+                }
+
+                const result = await response.json();
+                
+                // Hide analyzing section
+                document.getElementById('analyzing').classList.add('hidden');
+                
+                // Show the result
+                const resultDiv = document.getElementById('result');
+                const spamScore = document.getElementById('spamScore');
+                const statusDiv = document.getElementById('status');
+                const confidence = document.getElementById('confidence');
+                const recommendations = document.getElementById('recommendations');
+                
+                // Set the spam score indicator
+                const score = Math.round(result.confidence * 100);
+                spamScore.style.width = `${score}%`;
+                
+                // Set the classification
+                if (result.label === 'spam') {
+                    statusDiv.textContent = '⚠️ POTENTIALLY MALICIOUS EMAIL';
+                    statusDiv.className = 'result-status status-spam';
+                } else {
+                    statusDiv.textContent = '✅ LEGITIMATE EMAIL';
+                    statusDiv.className = 'result-status status-legitimate';
+                }
+                
+                // Set the confidence
+                confidence.textContent = `Confidence Level: ${score}%`;
+                
+                // Set recommendations
+                recommendations.textContent = result.label === 'spam' ?
+                    '• Do not interact with this email\n• Delete it immediately\n• Report to your security team' :
+                    '• Email appears safe\n• Stay cautious of unexpected links\n• Verify sender if unsure';
+                
+                // Show the result with highlight animation
+                resultDiv.classList.remove('hidden');
+                resultDiv.classList.add('highlight');
+                
+                // Store the result in localStorage for the index page
+                localStorage.setItem('analysisResult', JSON.stringify(result));
+            } catch (error) {
+                console.error('Error during analysis:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Add event listener for the "Analyze Another" button
+        document.getElementById('analyzeAnother').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+
+        // Start the analysis after a short delay to show the animation
+        setTimeout(performAnalysis, 2000);
+    </script>
+</body>
+</html>
