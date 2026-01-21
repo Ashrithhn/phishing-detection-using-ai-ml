@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analyzing Email - Phish Shield</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             transition: background 0.5s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .dark-mode {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -61,14 +63,20 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
         }
         .bounce-dot {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .progress-text {
             position: relative;
@@ -94,25 +102,26 @@
             left: 20px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
+            z-index: 1000;
         }
         .home-button:hover {
             transform: scale(1.1);
         }
         .logo {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
         }
         .app-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 800;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             -webkit-background-clip: text;
@@ -120,82 +129,157 @@
         }
         .result-card {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         .spam-indicator {
             width: 100%;
-            height: 4px;
+            height: 8px;
             background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #2ecc71 100%);
-            border-radius: 2px;
-            margin: 10px 0;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
         }
         .spam-score {
             width: 0%;
             height: 100%;
-            background: #3498db;
-            border-radius: 2px;
-            transition: width 1s ease;
+            background: linear-gradient(90deg, #e74c3c, #3498db);
+            border-radius: 4px;
+            transition: width 1.5s ease;
+            position: relative;
+        }
+        .spam-score::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         .result-status {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         .status-spam {
-            background-color: rgba(231, 76, 60, 0.2);
+            background-color: rgba(231, 76, 60, 0.15);
             color: #e74c3c;
+            border: 2px solid rgba(231, 76, 60, 0.3);
         }
         .status-legitimate {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+            border: 2px solid rgba(46, 204, 113, 0.3);
         }
         .confidence-level {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #3498db;
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
+            font-size: 1.4rem;
         }
         .security-measures {
-            background-color: rgba(52, 152, 219, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
+            background-color: rgba(52, 152, 219, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
         }
         .security-measures h3 {
             color: #3498db;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
         }
         .analysis-point {
             display: flex;
             align-items: center;
-            margin: 10px 0;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
+            border-radius: 10px;
             transition: all 0.3s ease;
         }
         .analysis-point:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .analysis-point svg {
-            margin-right: 10px;
+        .analysis-point i {
+            margin-right: 15px;
             flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
         }
         .highlight {
-            animation: highlight 1s ease;
+            animation: highlight 1.5s ease;
         }
         @keyframes highlight {
             0% { background-color: rgba(52, 152, 219, 0.2); }
             100% { background-color: transparent; }
+        }
+        .result-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        .details-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode .details-section {
+            background: rgba(40, 40, 40, 0.8);
         }
     </style>
 </head>
@@ -207,8 +291,8 @@
     </a>
 
     <div class="container mx-auto px-4 py-8">
-        <div class="max-w-2xl mx-auto">
-            <div class="text-center mb-8 fade-in">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-10 fade-in">
                 <div class="flex items-center justify-center mb-4">
                     <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -217,57 +301,86 @@
                     </svg>
                     <h1 class="app-title">Phish Shield</h1>
                 </div>
-                <p class="text-gray-600 text-lg">We're analyzing your email content</p>
+                <p class="text-gray-600 text-xl">We're analyzing your email content</p>
             </div>
 
-            <div id="analyzing" class="relative analysis-card rounded-lg p-8 mb-6 overflow-hidden">
+            <div id="analyzing" class="relative analysis-card rounded-2xl p-10 mb-8 overflow-hidden">
                 <div class="scan-line"></div>
                 
                 <div class="text-center">
-                    <div class="inline-block mb-4">
-                        <svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                    <div class="inline-block mb-6">
+                        <i class="fas fa-shield-alt text-blue-500 text-6xl animate-pulse"></i>
                     </div>
                     
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2 progress-text">Analyzing Content<span class="analyzing-dots"></span></h2>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4 progress-text">Analyzing Content<span class="analyzing-dots"></span></h2>
                     
-                    <div class="mt-6 space-y-4">
-                        <div class="flex items-center justify-center space-x-2">
-                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.1s"></div>
-                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.2s"></div>
-                            <div class="bounce-dot animate-bounce" style="animation-delay: 0.3s"></div>
+                    <div class="mt-8 space-y-5">
+                        <div class="flex items-center justify-center space-x-3">
+                            <div class="bounce-dot" style="animation-delay: 0.1s"></div>
+                            <div class="bounce-dot" style="animation-delay: 0.2s"></div>
+                            <div class="bounce-dot" style="animation-delay: 0.3s"></div>
                         </div>
                         
-                        <p class="text-gray-600 progress-text text-lg">Scanning for phishing indicators</p>
-                        <p class="text-gray-600 progress-text text-lg">Analyzing email structure and patterns</p>
-                        <p class="text-gray-600 progress-text text-lg">Evaluating security threats</p>
+                        <div class="space-y-3">
+                            <p class="text-gray-600 progress-text text-lg"><i class="fas fa-search mr-2"></i> Scanning for phishing indicators</p>
+                            <p class="text-gray-600 progress-text text-lg"><i class="fas fa-code mr-2"></i> Analyzing email structure and patterns</p>
+                            <p class="text-gray-600 progress-text text-lg"><i class="fas fa-exclamation-triangle mr-2"></i> Evaluating security threats</p>
+                            <p class="text-gray-600 progress-text text-lg"><i class="fas fa-calculator mr-2"></i> Calculating confidence scores</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="result" class="hidden result-card fade-in">
-                <h2 class="text-2xl font-bold mb-4">Security Analysis Result</h2>
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold mb-2">Security Analysis Result</h2>
+                    <p class="text-gray-600">Detailed breakdown of the security assessment</p>
+                </div>
+                
                 <div class="spam-indicator">
                     <div id="spamScore" class="spam-score"></div>
                 </div>
-                <div id="resultContent" class="mt-4">
-                    <div id="status" class="result-status"></div>
-                    <div id="confidence" class="confidence-level"></div>
+                <div class="text-center mb-4">
+                    <span class="text-sm text-gray-600">Low Risk</span>
+                    <span class="float-right text-sm text-gray-600">High Risk</span>
+                </div>
+                
+                <div id="resultContent" class="mt-6">
+                    <div id="status" class="result-status rounded-xl mb-4"></div>
+                    <div id="confidence" class="confidence-level text-xl mb-6"></div>
+                    
                     <div class="security-measures">
-                        <h3>Security Measures</h3>
-                        <p id="recommendations" class="text-gray-600"></p>
+                        <h3><i class="fas fa-shield-alt mr-2"></i>Security Recommendations</h3>
+                        <p id="recommendations" class="text-gray-600 mt-2 whitespace-pre-line"></p>
+                    </div>
+                    
+                    <div class="details-section mt-6">
+                        <h3 class="font-bold text-lg mb-3 text-gray-700 dark:text-gray-300"><i class="fas fa-info-circle mr-2"></i>Analysis Details</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Threat Level:</span>
+                                <span id="threatLevel" class="font-medium">Medium</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Processing Time:</span>
+                                <span id="processingTime" class="font-medium">0.00s</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Analysis Confidence:</span>
+                                <span id="analysisConfidence" class="font-medium">0%</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-6 text-center">
-                    <button id="analyzeAnother" class="btn-primary text-white font-bold py-3 px-6 rounded-lg">
-                        Analyze Another Email
+                
+                <div class="mt-8 text-center">
+                    <button id="analyzeAnother" class="btn-primary text-white font-bold py-4 px-8 rounded-xl">
+                        <i class="fas fa-sync-alt mr-2"></i>Analyze Another Email
                     </button>
                 </div>
             </div>
 
-            <div class="text-center">
+            <div class="text-center mt-10">
                 <p class="text-gray-500 text-lg">This process usually takes a few seconds</p>
             </div>
         </div>
@@ -285,6 +398,8 @@
         // Function to perform the analysis
         async function performAnalysis() {
             try {
+                const startTime = Date.now();
+                
                 const response = await fetch('/predict', {
                     method: 'POST',
                     body: new URLSearchParams({ email: emailText }),
@@ -299,6 +414,10 @@
 
                 const result = await response.json();
                 
+                // Calculate processing time
+                const endTime = Date.now();
+                const processingTime = ((endTime - startTime) / 1000).toFixed(2);
+                
                 // Hide analyzing section
                 document.getElementById('analyzing').classList.add('hidden');
                 
@@ -308,6 +427,9 @@
                 const statusDiv = document.getElementById('status');
                 const confidence = document.getElementById('confidence');
                 const recommendations = document.getElementById('recommendations');
+                const threatLevel = document.getElementById('threatLevel');
+                const procTime = document.getElementById('processingTime');
+                const analysisConf = document.getElementById('analysisConfidence');
                 
                 // Set the spam score indicator
                 const score = Math.round(result.confidence * 100);
@@ -315,20 +437,30 @@
                 
                 // Set the classification
                 if (result.label === 'spam') {
-                    statusDiv.textContent = '⚠️ POTENTIALLY MALICIOUS EMAIL';
+                    statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>POTENTIALLY MALICIOUS EMAIL';
                     statusDiv.className = 'result-status status-spam';
+                    threatLevel.textContent = 'High';
+                    threatLevel.className = 'font-medium text-red-600';
                 } else {
-                    statusDiv.textContent = '✅ LEGITIMATE EMAIL';
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>LEGITIMATE EMAIL';
                     statusDiv.className = 'result-status status-legitimate';
+                    threatLevel.textContent = 'Low';
+                    threatLevel.className = 'font-medium text-green-600';
                 }
                 
                 // Set the confidence
                 confidence.textContent = `Confidence Level: ${score}%`;
                 
+                // Set processing time
+                procTime.textContent = `${processingTime}s`;
+                
+                // Set analysis confidence
+                analysisConf.textContent = `${score}%`;
+                
                 // Set recommendations
                 recommendations.textContent = result.label === 'spam' ?
-                    '• Do not interact with this email\n• Delete it immediately\n• Report to your security team' :
-                    '• Email appears safe\n• Stay cautious of unexpected links\n• Verify sender if unsure';
+                    '• Do not interact with this email\n• Delete it immediately\n• Report to your security team\n• Block the sender if possible' :
+                    '• Email appears safe\n• Stay cautious of unexpected links\n• Verify sender if unsure\n• Keep your security software updated';
                 
                 // Show the result with highlight animation
                 resultDiv.classList.remove('hidden');

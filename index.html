@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phish Shield - Email Security</title>
+    <title>Phish Shield - Advanced Email Security</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             transition: background 0.5s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .loading-spinner {
             width: 50px;
@@ -37,7 +39,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
         }
         .card::before {
             content: '';
@@ -60,13 +63,15 @@
             100% { transform: translateX(100%) rotate(45deg); }
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
         textarea {
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
             font-size: 1.1rem;
+            border-radius: 10px;
+            resize: vertical;
         }
         textarea:focus {
             background: white;
@@ -78,6 +83,10 @@
             position: relative;
             overflow: hidden;
             font-size: 1.1rem;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         .btn-primary::after {
             content: '';
@@ -96,12 +105,32 @@
             animation: shine 3s infinite;
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-weight: 600;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(149, 165, 166, 0.4);
         }
         .error-card {
             background: rgba(254, 202, 202, 0.95);
             border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: 10px;
+        }
+        .success-card {
+            background: rgba(202, 255, 202, 0.95);
+            border: 1px solid rgba(72, 187, 120, 0.2);
+            border-radius: 10px;
         }
         .theme-toggle {
             position: fixed;
@@ -109,14 +138,15 @@
             right: 20px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
+            z-index: 1000;
         }
         .theme-toggle:hover {
             transform: scale(1.1);
@@ -144,18 +174,18 @@
         }
         .stats-card {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             margin-bottom: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
         .dark-mode .stats-card {
             background: rgba(40, 40, 40, 0.95);
         }
         .stats-number {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: #3498db;
             margin-bottom: 8px;
@@ -164,20 +194,21 @@
             color: #4da6ff;
         }
         .logo {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
         }
         .app-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 800;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #4a5568;
+            font-weight: 500;
         }
         .dark-mode .subtitle {
             color: #a0a0a0;
@@ -186,6 +217,8 @@
             position: relative;
             padding: 0.5rem 1rem;
             transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1.1rem;
         }
         .nav-link::after {
             content: '';
@@ -193,7 +226,7 @@
             bottom: 0;
             left: 0;
             width: 0;
-            height: 2px;
+            height: 3px;
             background: linear-gradient(90deg, #3498db, #2980b9);
             transition: width 0.3s ease;
         }
@@ -202,24 +235,98 @@
         }
         .feature-card {
             transition: all 0.3s ease;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px;
             text-align: center;
             background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
         .dark-mode .feature-card {
             background: rgba(40, 40, 40, 0.8);
         }
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
         .feature-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 15px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            color: #3498db;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            border-radius: 2px;
+        }
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 0;
+            margin-top: 60px;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode .footer {
+            background: rgba(40, 40, 40, 0.95);
+        }
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3498db;
+        }
+        .input-group textarea {
+            padding-left: 45px;
+        }
+        .floating-label {
+            position: absolute;
+            top: 15px;
+            left: 45px;
+            color: #718096;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        textarea:focus + .floating-label,
+        textarea:not(:placeholder-shown) + .floating-label {
+            top: -20px;
+            left: 45px;
+            font-size: 0.9rem;
             color: #3498db;
         }
     </style>
@@ -244,56 +351,124 @@
                 </div>
                 <div class="flex space-x-8">
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-600">Home</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-600">Features</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-600">About</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-600">Contact</a>
+                    <a href="#features" class="nav-link text-gray-700 hover:text-blue-600">Features</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-blue-600">About</a>
+                    <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600">Contact</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="container mx-auto px-4 py-8">
-        <div class="max-w-2xl mx-auto">
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Advanced Email Security</h1>
-                <p class="text-gray-600 text-lg">Protect yourself from phishing attacks with our AI-powered analysis</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="feature-card">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    <h3 class="text-xl font-bold mb-2">Real-time Analysis</h3>
-                    <p class="text-gray-600">Instant detection of phishing attempts and suspicious patterns</p>
+        <!-- Hero Section -->
+        <section class="max-w-4xl mx-auto text-center mb-16">
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">Advanced Email Security</h1>
+            <p class="text-gray-600 text-xl max-w-2xl mx-auto mb-10">Protect yourself from phishing attacks with our AI-powered analysis</p>
+            
+            <!-- Stats Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="stats-card">
+                    <div class="stats-number">98%</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Accuracy Rate</h3>
+                    <p class="text-gray-500 text-sm mt-1">Industry-leading precision</p>
                 </div>
-                <div class="feature-card">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <h3 class="text-xl font-bold mb-2">High Accuracy</h3>
-                    <p class="text-gray-600">Advanced AI algorithms for precise threat detection</p>
+                <div class="stats-card">
+                    <div class="stats-number">0.2s</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Avg. Response Time</h3>
+                    <p class="text-gray-500 text-sm mt-1">Lightning-fast analysis</p>
                 </div>
-                <div class="feature-card">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <h3 class="text-xl font-bold mb-2">Secure Processing</h3>
-                    <p class="text-gray-600">Your data is processed securely and never stored</p>
+                <div class="stats-card">
+                    <div class="stats-number">24/7</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Protection</h3>
+                    <p class="text-gray-500 text-sm mt-1">Continuous monitoring</p>
                 </div>
             </div>
 
-            <div class="card rounded-lg p-6 mb-6">
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-lg font-bold mb-2">Email Text</label>
-                    <textarea id="email" rows="6" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter email text here..."></textarea>
+            <!-- Features Section -->
+            <div class="mb-16" id="features">
+                <h2 class="section-title text-gray-800">Our Powerful Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="feature-card">
+                        <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h3 class="text-xl font-bold mb-2">Real-time Analysis</h3>
+                        <p class="text-gray-600">Instant detection of phishing attempts and suspicious patterns</p>
+                    </div>
+                    <div class="feature-card">
+                        <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <h3 class="text-xl font-bold mb-2">High Accuracy</h3>
+                        <p class="text-gray-600">Advanced AI algorithms for precise threat detection</p>
+                    </div>
+                    <div class="feature-card">
+                        <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <h3 class="text-xl font-bold mb-2">Secure Processing</h3>
+                        <p class="text-gray-600">Your data is processed securely and never stored</p>
+                    </div>
                 </div>
-                <button id="checkBtn" class="btn-primary w-full text-white font-bold py-3 px-4 rounded-lg">
-                    Analyze Email
-                </button>
             </div>
 
-            <div id="error" class="hidden error-card rounded-lg p-4 mb-6 fade-in"></div>
+            <!-- Main Analysis Card -->
+            <div class="card rounded-xl p-8 mb-12" id="analyze">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Analyze Your Email</h2>
+                    <div class="input-group">
+                        <textarea id="email" rows="6" class="w-full px-5 py-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder=" "></textarea>
+                        <i class="fas fa-envelope text-xl"></i>
+                        <label class="floating-label">Enter email text here...</label>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="checkBtn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-xl">
+                        <i class="fas fa-shield-alt mr-2"></i>Analyze Email
+                    </button>
+                    <button id="sampleBtn" class="btn-secondary w-full text-white font-bold py-4 px-6 rounded-xl">
+                        <i class="fas fa-lightbulb mr-2"></i>Load Sample
+                    </button>
+                </div>
+            </div>
+            
+            <!-- How It Works Section -->
+            <div class="mb-16" id="about">
+                <h2 class="section-title text-gray-800">How It Works</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl text-blue-600 font-bold">1</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Input</h3>
+                        <p class="text-gray-600">Paste your email content in the analyzer</p>
+                    </div>
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl text-blue-600 font-bold">2</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Analyze</h3>
+                        <p class="text-gray-600">Our AI examines patterns and suspicious elements</p>
+                    </div>
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl text-blue-600 font-bold">3</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Detect</h3>
+                        <p class="text-gray-600">Identifies phishing indicators and threats</p>
+                    </div>
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl text-blue-600 font-bold">4</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Result</h3>
+                        <p class="text-gray-600">Receive instant security assessment</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="hidden error-card rounded-xl p-5 mb-6 fade-in"></div>
+            <div id="success" class="hidden success-card rounded-xl p-5 mb-6 fade-in"></div>
         </div>
     </div>
 
@@ -311,14 +486,47 @@
         if (localStorage.getItem('darkMode') === 'true') {
             body.classList.add('dark-mode');
         }
+        
+        // Sample email content for demonstration
+        const sampleEmails = [
+            {
+                title: "Phishing Attempt",
+                content: "URGENT: Your account has been compromised! Click this link immediately to secure your account: http://fake-security-update.com. Failure to act within 24 hours will result in permanent account closure."
+            },
+            {
+                title: "Legitimate Email",
+                content: "Hi John,\n\nJust wanted to follow up on our meeting last week. The quarterly report is ready for review. Please let me know if you have any questions.\n\nBest regards,\nSarah"
+            }
+        ];
+        
+        // Load sample email content
+        document.getElementById('sampleBtn').addEventListener('click', () => {
+            const randomSample = sampleEmails[Math.floor(Math.random() * sampleEmails.length)];
+            document.getElementById('email').value = randomSample.content;
+            
+            // Show success message
+            const successDiv = document.getElementById('success');
+            successDiv.innerHTML = `<strong>${randomSample.title} Loaded:</strong> Sample email has been loaded into the analyzer.`;
+            successDiv.classList.remove('hidden');
+            
+            // Hide error if shown
+            document.getElementById('error').classList.add('hidden');
+            
+            // Auto-hide success message after 3 seconds
+            setTimeout(() => {
+                successDiv.classList.add('hidden');
+            }, 3000);
+        });
 
         document.getElementById('checkBtn').addEventListener('click', async () => {
             const userInput = document.getElementById('email').value.trim();
             const errorDiv = document.getElementById('error');
+            const successDiv = document.getElementById('success');
 
             if (!userInput) {
-                errorDiv.textContent = "Please enter some text to analyze";
+                errorDiv.innerHTML = "<strong>Error:</strong> Please enter some text to analyze";
                 errorDiv.classList.remove("hidden");
+                successDiv.classList.add('hidden');
                 return;
             }
 
@@ -329,5 +537,31 @@
             window.location.href = '/checking';
         });
     </script>
+    
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="flex justify-center space-x-6 mb-4">
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">Stay protected with our advanced AI-powered email security solution.</p>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p class="text-gray-500 dark:text-gray-400">© 2024 Phish Shield. All rights reserved. | Designed with <i class="fas fa-heart text-red-500"></i> for digital security</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
