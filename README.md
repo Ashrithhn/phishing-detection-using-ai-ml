@@ -1,7 +1,7 @@
 # Phish Shield - Email Security Analysis
 
 ## Project Overview
-Phish Shield is an AI-powered email security analysis tool that helps detect phishing attempts and malicious emails. It uses machine learning to analyze email content and provide real-time security assessments.
+Phish Shield is an AI-powered email security analysis tool that helps detect phishing attempts and malicious emails. It uses machine learning libraries to analyze email content and provide real-time security assessments.
 
 ## Technical Stack
 
