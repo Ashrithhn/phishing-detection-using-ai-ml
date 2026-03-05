@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 import joblib
 
 # Load the data
-print("Loading data...")
+print("Loading data wait...")
 mail_data = pd.read_csv('mail_data.csv')
 mail_data = mail_data.where((pd.notnull(mail_data)), '')
 
